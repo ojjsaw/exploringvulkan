@@ -1,35 +1,74 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
 #include <iostream>
+#include <stdexcept>
+#include <functional>
+#include <cstdlib>
 
-int main() {
-	glfwInit();
+const int WIDTH = 800;
+const int HEIGHT = 600;
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-	std::cout << extensionCount << " extensions supported" << std::endl;
-
-	glm::mat4 matrix;
-	glm::vec4 vec;
-	auto test = matrix * vec;
-
-	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
+class HelloTriangleApplication {
+public:
+	void run() {
+		initWindow();
+		initVulkan();
+		mainLoop();
+		cleanup();
 	}
 
-	glfwDestroyWindow(window);
+private:
+	GLFWwindow* window;
 
-	glfwTerminate();
+	void initWindow() {
 
-	return 0;
+		//initializes the GLFW library
+		glfwInit();
+
+		//Because GLFW was originally designed to create an OpenGL context, 
+		//we need to tell it to not create an OpenGL context with a subsequent call
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		
+		//Disable resizing for now, more code to handle
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+		//Creating the actual window
+		//Optionally specify monitor to open the window on
+		//last relevant to OpenGL only
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+
+	}
+
+	void initVulkan() {
+
+	}
+
+	void mainLoop() {
+		//keep the application running until either an error occurs or the window is closed
+		while (!glfwWindowShouldClose(window)) {
+			//checks for events like pressing the X button until the window has been closed by the user
+			glfwPollEvents();
+		}
+	}
+
+	void cleanup() {
+		//destroying it 
+		glfwDestroyWindow(window);
+		//terminate glfw itself
+		glfwTerminate();
+	}
+};
+
+int main() {
+	HelloTriangleApplication app;
+
+	try {
+		app.run();
+	}
+	catch (const std::runtime_error& e) {
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }
